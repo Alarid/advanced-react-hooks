@@ -10,6 +10,35 @@ import {
   PokemonErrorBoundary,
 } from '../pokemon'
 
+/**
+ * Use Safe Dispatch custom hook
+ * Only dispatch when component is mounted
+ */
+function useSafeDispatch(dispatch) {
+  const mountedRef = React.useRef(false)
+
+  // Layout effect to ensure this is executed ASAP, and cleant ASAP
+  React.useLayoutEffect(() => {
+    mountedRef.current = true
+    return () => {
+      mountedRef.current = false
+    }
+  }, [])
+
+  // Return memoized version of the safe dispatch
+  return React.useCallback(
+    (...args) => {
+      if (mountedRef.current) {
+        dispatch(...args)
+      }
+    },
+    [dispatch],
+  )
+}
+
+/**
+ * Reducer for our async fetch state
+ */
 function asyncReducer(state, action) {
   switch (action.type) {
     case 'pending': {
@@ -27,46 +56,51 @@ function asyncReducer(state, action) {
   }
 }
 
-function useAsync(asyncCallback, initialState, dependencies) {
-  const [state, dispatch] = React.useReducer(asyncReducer, {
+/**
+ * Use Async custom hook
+ */
+function useAsync(initialState) {
+  const [state, unsafeDispatch] = React.useReducer(asyncReducer, {
     status: 'idle',
     data: null,
     error: null,
     ...initialState,
   })
 
-  React.useEffect(() => {
-    const promise = asyncCallback()
-    if (!promise) {
-      return
-    }
-    dispatch({type: 'pending'})
-    promise.then(
-      data => {
-        dispatch({type: 'resolved', data})
-      },
-      error => {
-        dispatch({type: 'rejected', error})
-      },
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, dependencies)
+  const dispatch = useSafeDispatch(unsafeDispatch)
 
-  return state
+  const run = React.useCallback(
+    promise => {
+      dispatch({type: 'pending'})
+      promise.then(
+        data => {
+          dispatch({type: 'resolved', data})
+        },
+        error => {
+          dispatch({type: 'rejected', error})
+        },
+      )
+    },
+    [dispatch],
+  )
+
+  return {...state, run}
 }
 
+/**
+ * Pokemon Info component
+ */
 function PokemonInfo({pokemonName}) {
-  const state = useAsync(
-    () => {
-      if (!pokemonName) {
-        return
-      }
-      return fetchPokemon(pokemonName)
-    },
-    {status: pokemonName ? 'pending' : 'idle'},
-    [pokemonName],
-  )
-  const {data: pokemon, status, error} = state
+  const {data: pokemon, status, error, run} = useAsync({
+    status: pokemonName ? 'pending' : 'idle',
+  })
+
+  React.useEffect(() => {
+    if (!pokemonName) {
+      return
+    }
+    run(fetchPokemon(pokemonName))
+  }, [pokemonName, run])
 
   if (status === 'idle' || !pokemonName) {
     return 'Submit a pokemon'
@@ -81,6 +115,9 @@ function PokemonInfo({pokemonName}) {
   throw new Error('This should be impossible')
 }
 
+/**
+ * App
+ */
 function App() {
   const [pokemonName, setPokemonName] = React.useState('')
 
