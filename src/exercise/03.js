@@ -16,7 +16,7 @@ function CountProvider(props) {
 function useCount() {
   const context = React.useContext(CountContext)
   if (!context) {
-    throw new Error('useCount must be use within a CountProvider')
+    throw new Error('useCount must be used within a CountProvider')
   }
   return context
 }
