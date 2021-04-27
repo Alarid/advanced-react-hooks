@@ -1,3 +1,20 @@
+This is a fork of the workshop <a href="https://epicreact.dev/advanced-hooks">🔥
+Advanced React Hooks</a> from 🚀 EpicReact.Dev by
+[Kent C. Dodds](https://kentcdodds.com/). In this fork, I followed along the
+workshop exercises by working in the `src/exercise` folder, while elaborating on
+my learnings for each exercise in the associated markdown file.
+
+## Table of content
+
+1. [useReducer: simple Counter](https://github.com/Alarid/advanced-react-hooks/blob/main/src/exercise/01.md)
+2. [useCallback: custom hooks](https://github.com/Alarid/advanced-react-hooks/blob/main/src/exercise/02.md)
+3. [useContext: simple Counter](https://github.com/Alarid/advanced-react-hooks/blob/main/src/exercise/03.md)
+4. [useLayoutEffect: auto-scrolling textarea](https://github.com/Alarid/advanced-react-hooks/blob/main/src/exercise/04.md)
+5. [useImperativeHandle: scroll to top/bottom](https://github.com/Alarid/advanced-react-hooks/blob/main/src/exercise/05.md)
+6. [useDebugValue: useMedia](https://github.com/Alarid/advanced-react-hooks/blob/main/src/exercise/06.md)
+
+---
+
 <div>
   <h1 align="center"><a href="https://epicreact.dev/advanced-hooks">🔥 Advanced React Hooks 🚀 EpicReact.Dev</a></h1>
   <strong>
